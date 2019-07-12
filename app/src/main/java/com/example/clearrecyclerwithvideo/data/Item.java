@@ -86,13 +86,7 @@ public class Item implements Cloneable {
   @Override
   public String toString() {
     return "Item{" +
-      "id='" + id + '\'' +
-      ", hash=" + hash +
-      ", position=" + position +
-      ", text='" + text + '\'' +
-      ", color=" + color +
-      ", url='" + url + '\'' +
-      ", backgroundUrl='" + backgroundUrl + '\'' +
+      "position=" + position +
       '}';
   }
 }

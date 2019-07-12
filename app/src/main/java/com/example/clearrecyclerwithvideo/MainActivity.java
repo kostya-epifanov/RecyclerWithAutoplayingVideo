@@ -19,8 +19,10 @@ import com.example.clearrecyclerwithvideo.utils.Utils;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.TimeUnit;
 
 import reactor.core.Disposable;
+import reactor.core.publisher.PublisherUtils;
 import reactor.core.scheduler.Schedulers;
 
 import static java.util.Objects.requireNonNull;
@@ -47,20 +49,21 @@ public class MainActivity extends AppCompatActivity {
 
     mRecycler = this.findViewById(R.id.recycler);
     mRecycler.setAdapter(Utils.getSimpleAdapter(LayoutInflater.from(this), R.layout.item_player_card));
-    mRecycler.setItemViewCacheSize(0);
+    mRecycler.setItemViewCacheSize(2);
 
     mRecycler.setLayoutManager(new LinearLayoutManager(this) {
       @Override
       public boolean supportsPredictiveItemAnimations() {
         return false;
       }
+
     });
 
     mScrollDisposable =
       Utils.scrollEvents(mRecycler)
-        .sample(Duration.ofMillis(600))
+        //.sample(Duration.ofMillis(600))
         //.sampleTimeout(point -> PublisherUtils.delay(300, TimeUnit.MILLISECONDS, Schedulers.elastic()))
-        .publishOn(Schedulers.fromExecutor(this::runOnUiThread))
+        //.publishOn(Schedulers.fromExecutor(this::runOnUiThread))\
         .subscribe(this::onScrolled);
 
     new DataService().load(0, DataService.urls.size())

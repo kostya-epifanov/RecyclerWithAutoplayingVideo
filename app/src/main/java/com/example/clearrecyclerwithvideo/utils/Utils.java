@@ -86,82 +86,6 @@ public class Utils {
   }
 
   @SuppressWarnings("SameParameterValue")
-  public static <T> PagedListAdapter<T, RecyclerView.ViewHolder>
-  getPagedAdapter(@NonNull LayoutInflater inflater, @LayoutRes int layout) {
-    return new PagedListAdapter<T, RecyclerView.ViewHolder>(
-      new AsyncDifferConfig.Builder<>
-        (new DiffUtil.ItemCallback<T>() {
-          @SuppressWarnings("NullableProblems")
-          @Override
-          public final boolean
-          areItemsTheSame(T oldItem, T newItem) {
-            //System.out.println("areItemsTheSame: " + "oldItem = [" + oldItem + "], newItem = [" + newItem + "]");
-            boolean result = oldItem.hashCode() == newItem.hashCode();
-            return result;
-          }
-
-          @SuppressWarnings("NullableProblems")
-          @Override
-          public final boolean
-          areContentsTheSame(T oldItem, T newItem) {
-            //System.out.println("areContentsTheSame: " + "oldItem = [" + oldItem + "], newItem = [" + newItem + "]");
-            boolean result = Objects.equals(oldItem, newItem);
-            return result;
-          }
-
-          @Nullable
-          @Override
-          public Object getChangePayload(@NonNull T oldItem, @NonNull T newItem) {
-            //System.out.println("getChangePayload: oldItem = [" + oldItem + "], newItem = [" + newItem + "]");
-            return newItem;
-          }
-        }).setBackgroundThreadExecutor(Runnable::run)
-        .build()
-    ) {
-      {
-        setHasStableIds(false);
-      }
-
-      @SuppressWarnings("NullableProblems")
-      @Override
-      public final RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
-        View inflate = inflater.inflate(type, parent, false);
-        return new RecyclerView.ViewHolder(inflate) {
-        };
-      }
-
-      @Override
-      public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
-        if (payloads.isEmpty()) onBindViewHolder(holder, position);
-        else {
-          final Consumer<T> view = ((Consumer<T>) holder.itemView);
-          payloads.forEach(item -> view.accept((T) item));
-        }
-
-        //((Consumer<T>) holder.itemView).accept(getItem(position));
-      }
-
-      @SuppressWarnings({"unchecked", "NullableProblems"})
-      @Override
-      public final void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((Consumer<T>) holder.itemView).accept(getItem(position));
-      }
-
-      @Override
-      public final int getItemViewType(int position) {
-        return layout;
-      }
-
-      @Nullable
-      @Override
-      protected T getItem(int position) {
-        return super.getItem(position);
-      }
-
-    };
-  }
-
-  @SuppressWarnings("SameParameterValue")
   public static <T> ListAdapter<T, RecyclerView.ViewHolder>
   getSimpleAdapter(@NonNull LayoutInflater inflater, @LayoutRes int layout) {
     return new ListAdapter<T, RecyclerView.ViewHolder>(
@@ -204,6 +128,14 @@ public class Utils {
       public final int getItemViewType(int position) {
         return layout;
       }
+
+      @SuppressWarnings({"unchecked"})
+      @Override
+      public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        ((Consumer<T>) holder.itemView).accept(null);
+        System.out.println("TRANZ: " + holder.itemView.hasTransientState());
+      }
+
     };
   }
 

@@ -1,11 +1,17 @@
 package com.example.clearrecyclerwithvideo.view;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.widget.Checkable;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.example.clearrecyclerwithvideo.R;
 import com.example.clearrecyclerwithvideo.data.Item;
@@ -16,11 +22,16 @@ import com.google.android.exoplayer2.video.VideoListener;
 
 import java.util.function.Consumer;
 
+import reactor.core.Disposable;
+import reactor.core.Disposables;
+
 /**
  * @author Konstantin Epifanov
  * @since 09.07.2019
  */
 public class PlayerCardView extends FrameLayout implements Consumer<Item>, Checkable {
+
+  private Disposable.Swap mSwap = null;
 
   private PlayerTextureView mTextureView;
   private TextView mLabelView;
@@ -28,10 +39,6 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
 
   private Item data = null;
   private boolean isActive = false;
-
-  private static final Runnable DUMMY_CLEANER = () -> {
-  };
-  private Runnable cleaner = DUMMY_CLEANER;
 
 /*  public int verticalCenter = 0;
   private float cachedTranslationY = getTranslationY();
@@ -68,51 +75,106 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
     background.setData(url.getBytes());
   }
 
-  public PlayerTextureView getTextureView() {
-    return mTextureView;
-  }
-
-  public void setPlayer(SimpleExoPlayer player) {
-    cleaner.run();
-    cleaner = DUMMY_CLEANER;
-
-    if (player != null) {
-
-      VideoListener listener = new VideoListener() {
-        @Override
-        public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-          mTextureView.initialize(width, height);
-        }
-
-        @Override
-        public void onRenderedFirstFrame() {
-          mTextureView.setAlpha(1f);
-        }
-      };
-
-      player.addVideoListener(listener);
-      player.setVideoTextureView(mTextureView);
-
-      cleaner = () -> {
-        player.removeVideoListener(listener);
-        mTextureView.setAlpha(0f);
-      };
-    }
-  }
-
   @Override
   public void accept(Item item) {
+    System.out.println("accept item = [" + item + "]");
+
     this.data = item;
-    mLabelView.setText(String.format("pos[%s]\nurl[%s]", item.getText(), item.getUrl()));
-    setImageBackground(item.getBackgroundUrl());
+
+    if (mSwap != null) mSwap.dispose();
+    mSwap = null;
+
+    mTextureView.setAlpha(0f);
+
+    if (item != null) {
+      mSwap = Disposables.swap();
+      mLabelView.setText(String.format("pos[%s]\nurl[%s]", item.getText(), item.getUrl()));
+      setImageBackground(item.getBackgroundUrl());
+    }
+
+    invalidateState(true);
   }
 
   @Override
   public void setChecked(boolean checked) {
     if (checked == isActive) return;
+
     System.out.println("setChecked checked = [" + checked + "] " + this.hashCode());
+
     isActive = checked;
-    setPlayer(isActive ? ExoHolder.get(getContext(), data.getUrl()) : null);
+
+    invalidateState(false);
+  }
+
+  private void invalidateState(boolean immediateFade) {
+    if (mSwap != null && data != null) {
+      mSwap.update(setPlayer(isActive ? ExoHolder.get(getContext(), data.getUrl()) : null, immediateFade));
+    }
+  }
+
+  public Disposable setPlayer(SimpleExoPlayer player, boolean immediateFade) {
+    return player == null ?
+      Disposables.single() : setPlayerInternal(player, mTextureView, immediateFade);
+  }
+
+  private static Disposable setPlayerInternal(@NonNull SimpleExoPlayer player, PlayerTextureView texture, boolean immediateFade){
+    final Disposable.Swap swap = Disposables.swap();
+
+    final Disposable d = immediateFade ? () -> texture.setAlpha(0f) : executeAnimation(alphaTo(texture, false));
+
+    return Disposables.composite(
+      getVideoSize(player, point -> texture.initialize(point.x, point.y)),
+      getFirstFrame(player, () -> swap.update(executeAnimation(alphaTo(texture, true)))),
+      setupTextureView(player, texture),
+      d,
+      //executeAnimation(alphaTo(texture, false)), //todo подумать
+      //() -> texture.setAlpha(0f),
+      swap
+    );
+  }
+
+  private static ViewPropertyAnimator alphaTo(View view, boolean state) {
+    System.out.println("PlayerCardView.alphaTo: (" +"): " + state);
+    return view.animate()
+      .alpha(state ? 1f : 0f)
+      .setDuration(200);
+  }
+
+  private static Disposable executeAnimation(ViewPropertyAnimator animator) {
+    animator.start();
+    return Disposables.composite(animator::cancel);
+  }
+
+  private static Disposable getVideoSize(SimpleExoPlayer player, Consumer<Point> consumer) {
+    final VideoListener listener = new VideoListener() {
+      @Override
+      public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+        consumer.accept(new Point(width, height));
+      }
+    };
+
+    player.addVideoListener(listener);
+    return Disposables.composite((Disposable) () -> player.removeVideoListener(listener));
+  }
+
+  private static Disposable getFirstFrame(SimpleExoPlayer player, Runnable runnable) {
+    final Disposable.Composite composite = Disposables.composite();
+    final VideoListener listener = new VideoListener() {
+      @Override
+      public void onRenderedFirstFrame() {
+        runnable.run();
+        composite.dispose();
+      }
+    };
+
+    player.addVideoListener(listener);
+    composite.add(() -> player.removeVideoListener(listener));
+    return composite;
+  }
+
+  private static Disposable setupTextureView(SimpleExoPlayer player, PlayerTextureView texture) {
+    player.setVideoTextureView(texture);
+    return Disposables.composite((Disposable) () -> player.setVideoTextureView(null));
   }
 
   @Override
