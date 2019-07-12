@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion "29.0.0"
+    defaultConfig {
+        applicationId "com.example.clearrecyclerwithvideo"
+        minSdkVersion 26
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+}
+
+
+repositories {
+    maven { url 'https://mymavenrepo.com/repo/7MozY4YXjSx9vcphEb2k/'}
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
+
+    implementation 'io.projectreactor:reactor-core:' + project.properties['version.reactor.core']
+    implementation 'io.projectreactor.addons:reactor-extra:' + project.properties['version.reactor.extra']
+    implementation 'androidx.paging:paging-runtime:' + project.properties['version.paging']
+
+    implementation 'com.google.android.exoplayer:exoplayer-core:' + project.properties['version.exoplayer']
+    implementation 'com.google.android.exoplayer:exoplayer-ui:'+ project.properties['version.exoplayer']
+    implementation 'com.google.android.exoplayer:exoplayer-hls:'+ project.properties['version.exoplayer']
+
+    implementation 'com.github.bumptech.glide:glide:' + project.properties['version.glide']
+    implementation 'com.github.bumptech.glide:annotations:' + project.properties['version.glide']
+
+    annotationProcessor 'com.github.bumptech.glide:compiler:' + project.properties['version.glide']
+    annotationProcessor 'androidx.annotation:annotation:' + project.properties['version.annotation']
+
+    implementation "webka:internals:0.0.1"
+
+}
