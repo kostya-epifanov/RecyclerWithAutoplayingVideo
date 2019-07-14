@@ -1,9 +1,9 @@
 package com.example.clearrecyclerwithvideo.view;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
@@ -20,6 +20,7 @@ import com.example.clearrecyclerwithvideo.utils.ExoHolder;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.video.VideoListener;
 
+import java.text.MessageFormat;
 import java.util.function.Consumer;
 
 import reactor.core.Disposable;
@@ -31,14 +32,14 @@ import reactor.core.Disposables;
  */
 public class PlayerCardView extends FrameLayout implements Consumer<Item>, Checkable {
 
-  private Disposable.Swap mSwap = null;
-
   private PlayerTextureView mTextureView;
   private TextView mLabelView;
-  private DrawableTarget background;
+  private DrawableTarget mBackground;
 
-  private Item data = null;
-  private boolean isActive = false;
+  private Item mDataItem = null;
+  private boolean mIsActive = false;
+
+  private Disposable.Swap mSwap = null;
 
 /*  public int verticalCenter = 0;
   private float cachedTranslationY = getTranslationY();
@@ -58,8 +59,8 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
 
     System.out.println("CONSTRUCOR");
 
-    background = new DrawableTarget(getResources(), 16, -1, -1, Color.GREEN);
-    setBackground(background);
+    mBackground = new DrawableTarget(getResources(), 16, -1, -1, Color.GREEN);
+    setBackground(mBackground);
 
     setClipToOutline(true);
   }
@@ -71,15 +72,11 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
     mLabelView = findViewById(R.id.label_user_info);
   }
 
-  public void setImageBackground(String url) {
-    background.setData(url.getBytes());
-  }
-
   @Override
   public void accept(Item item) {
-    System.out.println("accept item = [" + item + "]");
+    System.out.println("accept [" + item + "] " + hashCode());
 
-    this.data = item;
+    this.mDataItem = item;
 
     if (mSwap != null) mSwap.dispose();
     mSwap = null;
@@ -88,8 +85,9 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
 
     if (item != null) {
       mSwap = Disposables.swap();
-      mLabelView.setText(String.format("pos[%s]\nurl[%s]", item.getText(), item.getUrl()));
-      setImageBackground(item.getBackgroundUrl());
+      mLabelView.setText(MessageFormat.format("HASH: {0}", hashCode()));
+      mBackground.setData(item.getBackgroundUrl().getBytes());
+      //mLabelView.setText(String.format("pos[%s]\nurl[%s]", item.getText(), item.getUrl()));
     }
 
     invalidateState(true);
@@ -97,44 +95,62 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
 
   @Override
   public void setChecked(boolean checked) {
-    if (checked == isActive) return;
+    if (checked == mIsActive) return;
 
     System.out.println("setChecked checked = [" + checked + "] " + this.hashCode());
 
-    isActive = checked;
-
+    mIsActive = checked;
     invalidateState(false);
   }
 
   private void invalidateState(boolean immediateFade) {
-    if (mSwap != null && data != null) {
-      mSwap.update(setPlayer(isActive ? ExoHolder.get(getContext(), data.getUrl()) : null, immediateFade));
+    System.out.println("invalidateState immediateFade = [" + immediateFade + "] " + hashCode());
+    if (mSwap != null && mDataItem != null) {
+      System.out.println("swap update: active " + mIsActive + " " + hashCode());
+      mSwap.update(setPlayer(
+        mIsActive ? ExoHolder.get(getContext(), mDataItem.getUrl()) : null,
+        immediateFade));
     }
   }
 
-  public Disposable setPlayer(SimpleExoPlayer player, boolean immediateFade) {
+  private Disposable setPlayer(SimpleExoPlayer player, boolean immediateFade) {
+    System.out.println("setPlayer: p.isNull = [" + (player == null) + "], im_f = [" + immediateFade + "] " + hashCode());
+
+    if (player == null) {
+      //mTextureView.setAlpha(0f);
+
+      /*
+      if (immediateFade) mTextureView.setAlpha(0f);
+      else executeAnimation(alphaTo(mTextureView, false));
+      //TODO анимация мгновенно канселтся после начала. выяснить причину.
+      */
+
+    }
+
     return player == null ?
-      Disposables.single() : setPlayerInternal(player, mTextureView, immediateFade);
+      Disposables.single() :
+
+      /*immediateFade ? () -> {
+        System.out.println("immediate fade " + hashCode());
+        mTextureView.setAlpha(0f);
+      } : executeAnimation(alphaTo(mTextureView, false)) :*/
+
+      setPlayerInternal(player, mTextureView);
   }
 
-  private static Disposable setPlayerInternal(@NonNull SimpleExoPlayer player, PlayerTextureView texture, boolean immediateFade){
+  private static Disposable setPlayerInternal(@NonNull SimpleExoPlayer player, PlayerTextureView texture) {
     final Disposable.Swap swap = Disposables.swap();
-
-    final Disposable d = immediateFade ? () -> texture.setAlpha(0f) : executeAnimation(alphaTo(texture, false));
 
     return Disposables.composite(
       getVideoSize(player, point -> texture.initialize(point.x, point.y)),
       getFirstFrame(player, () -> swap.update(executeAnimation(alphaTo(texture, true)))),
       setupTextureView(player, texture),
-      d,
-      //executeAnimation(alphaTo(texture, false)), //todo подумать
-      //() -> texture.setAlpha(0f),
       swap
     );
   }
 
   private static ViewPropertyAnimator alphaTo(View view, boolean state) {
-    System.out.println("PlayerCardView.alphaTo: (" +"): " + state);
+    System.out.println("PlayerCardView.alphaTo: (" + view.getParent().hashCode() + "): " + state);
     return view.animate()
       .alpha(state ? 1f : 0f)
       .setDuration(200);
@@ -142,7 +158,10 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
 
   private static Disposable executeAnimation(ViewPropertyAnimator animator) {
     animator.start();
-    return Disposables.composite(animator::cancel);
+    return Disposables.composite(() -> {
+      System.out.println("animation CANCEL");
+      animator.cancel();
+    });
   }
 
   private static Disposable getVideoSize(SimpleExoPlayer player, Consumer<Point> consumer) {
@@ -154,11 +173,15 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
     };
 
     player.addVideoListener(listener);
-    return Disposables.composite((Disposable) () -> player.removeVideoListener(listener));
+    return Disposables.composite((Disposable) () -> {
+      System.out.println("PlayerCardView.getVideoSize: dispose");
+      player.removeVideoListener(listener);
+    });
   }
 
   private static Disposable getFirstFrame(SimpleExoPlayer player, Runnable runnable) {
     final Disposable.Composite composite = Disposables.composite();
+
     final VideoListener listener = new VideoListener() {
       @Override
       public void onRenderedFirstFrame() {
@@ -168,23 +191,33 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
     };
 
     player.addVideoListener(listener);
-    composite.add(() -> player.removeVideoListener(listener));
+    composite.add(() -> {
+      System.out.println("PlayerCardView.getFirstFrame: dispose");
+      player.removeVideoListener(listener);
+    });
     return composite;
   }
 
   private static Disposable setupTextureView(SimpleExoPlayer player, PlayerTextureView texture) {
     player.setVideoTextureView(texture);
-    return Disposables.composite((Disposable) () -> player.setVideoTextureView(null));
+    return Disposables.composite((Disposable) () -> {
+      System.out.println("PlayerCardView.setupTextureView: dispose");
+      player.setVideoTextureView(null);
+    });
   }
 
   @Override
   public boolean isChecked() {
-    return isActive;
+    return mIsActive;
   }
 
   @Override
   public void toggle() {
-    isActive = !isActive;
+    mIsActive = !mIsActive;
+  }
+
+  public void forcedFade() {
+    executeAnimation(alphaTo(mTextureView, false));
   }
 
   /*

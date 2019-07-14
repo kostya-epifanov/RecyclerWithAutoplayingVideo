@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <com.example.paginationpolygon.pagination.PlayerTextureView
-        android:id="@+id/texture_end"
+        android:id="@+id/player_full"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:transitionName="@string/shared_player"
