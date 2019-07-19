@@ -1,6 +1,6 @@
 package com.example.clearrecyclerwithvideo.data;
 
-import com.example.clearrecyclerwithvideo.utils.Constants;
+import com.example.clearrecyclerwithvideo.Constants;
 
 import java.util.ArrayList;
 import java.util.List;

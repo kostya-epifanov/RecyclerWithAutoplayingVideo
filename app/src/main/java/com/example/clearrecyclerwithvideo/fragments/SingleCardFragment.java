@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.clearrecyclerwithvideo.R;
 import com.example.clearrecyclerwithvideo.data.DataService;
-import com.example.clearrecyclerwithvideo.utils.Constants;
+import com.example.clearrecyclerwithvideo.Constants;
 import com.example.clearrecyclerwithvideo.view.PlayerCardView;
 
 

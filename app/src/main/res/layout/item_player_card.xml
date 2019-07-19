@@ -10,9 +10,9 @@
     android:clickable="true"
     android:clipChildren="true"
     android:focusable="true"
-    android:foreground="@drawable/ripple"
     android:foregroundGravity="fill"
     android:orientation="vertical"
+    android:foreground="@drawable/ripple"
     android:stateListAnimator="@drawable/card_statelist_animator">
 
     <com.example.clearrecyclerwithvideo.view.PlayerTextureView

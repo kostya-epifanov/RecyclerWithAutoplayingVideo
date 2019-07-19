@@ -17,11 +17,12 @@ import com.example.clearrecyclerwithvideo.R;
 import com.example.clearrecyclerwithvideo.data.DataService;
 import com.example.clearrecyclerwithvideo.data.Item;
 import com.example.clearrecyclerwithvideo.utils.ChildViews;
-import com.example.clearrecyclerwithvideo.utils.Constants;
+import com.example.clearrecyclerwithvideo.Constants;
 import com.example.clearrecyclerwithvideo.utils.Utils;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
@@ -78,13 +79,13 @@ public class RecyclerFragment extends Fragment {
         //.publishOn(Schedulers.fromExecutor(this::runOnUiThread))\
         .subscribe(this::onScrolled);
 
-    new DataService().load(Constants.urls2, 0, Constants.urls2.size())
+    List<DataService.UrlHolder> urls = Constants.urls;
+    new DataService().load(urls, 0, urls.size())
       .publishOn(Schedulers.fromExecutor(r -> getActivity().runOnUiThread(r)))
       .subscribe(this::submitList);
 
     return root;
   }
-
 
   @SuppressWarnings("unchecked")
   public void submitList(Item[] items) {
@@ -93,9 +94,8 @@ public class RecyclerFragment extends Fragment {
   }
 
   private void onScrolled(Point point) {
-    //todo find vertical center (maybe onSizeChanged
+    //todo find vertical center (maybe onSizeChanged)
     final int recyclerCY = mRecycler.getHeight() >> 1;
-
     ChildViews.parallel(mRecycler)
       .min(minDistComparator(recyclerCY))
       .ifPresent(closest -> activate((Checkable) closest));
@@ -122,7 +122,6 @@ public class RecyclerFragment extends Fragment {
     super.onDestroy();
   }
 }
-
 
 /*
  * return Math.abs(((PlayerCardView) v).verticalCenter - target);

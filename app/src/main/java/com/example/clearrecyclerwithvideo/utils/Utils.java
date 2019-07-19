@@ -11,14 +11,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -59,18 +56,17 @@ public class Utils {
 
   public static Flux<Point> scrollEvents(RecyclerView recycler) {
     return Flux.create(sink ->
-      sink.onDispose(scrollToDisposable(recycler,
-        new RecyclerView.OnScrollListener() {
-          {
-            recycler.addOnScrollListener(this);
-          }
+      sink.onDispose(scrollToDisposable(recycler, new RecyclerView.OnScrollListener() {
+        {
+          recycler.addOnScrollListener(this);
+        }
 
-          @Override
-          public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-            sink.next(new Point(dx, dy));
-          }
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+          sink.next(new Point(dx, dy));
+        }
 
-        })), FluxSink.OverflowStrategy.IGNORE);
+      })), FluxSink.OverflowStrategy.IGNORE);
   }
 
   public static Disposable scrollToDisposable(RecyclerView recycler, RecyclerView.OnScrollListener listener) {
@@ -121,6 +117,7 @@ public class Utils {
       @SuppressWarnings({"unchecked", "NullableProblems"})
       @Override
       public final void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        System.out.println("Adapter.onBindViewHolder: " + position);
         ((Consumer<T>) holder.itemView).accept(getItem(position));
       }
 
@@ -132,8 +129,8 @@ public class Utils {
       @SuppressWarnings({"unchecked"})
       @Override
       public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        System.out.println("Adapter.onViewRecycled");
         ((Consumer<T>) holder.itemView).accept(null);
-        System.out.println("TRANZ: " + holder.itemView.hasTransientState());
       }
 
     };

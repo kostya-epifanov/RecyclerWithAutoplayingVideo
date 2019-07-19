@@ -3,7 +3,6 @@ package com.example.clearrecyclerwithvideo.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
@@ -40,6 +39,8 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
   private boolean mIsActive = false;
 
   private Disposable.Swap mSwap = null;
+
+/*  private Runnable mPendingCheckedRunnable = null;*/
 
 /*  public int verticalCenter = 0;
   private float cachedTranslationY = getTranslationY();
@@ -118,24 +119,13 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
 
     if (player == null) {
       //mTextureView.setAlpha(0f);
-
-      /*
-      if (immediateFade) mTextureView.setAlpha(0f);
+      /*if (immediateFade) mTextureView.setAlpha(0f);
       else executeAnimation(alphaTo(mTextureView, false));
-      //TODO анимация мгновенно канселтся после начала. выяснить причину.
-      */
-
+      //TODO анимация мгновенно канселтся после начала. выяснить причину.*/
     }
 
     return player == null ?
-      Disposables.single() :
-
-      /*immediateFade ? () -> {
-        System.out.println("immediate fade " + hashCode());
-        mTextureView.setAlpha(0f);
-      } : executeAnimation(alphaTo(mTextureView, false)) :*/
-
-      setPlayerInternal(player, mTextureView);
+      Disposables.single() : setPlayerInternal(player, mTextureView);
   }
 
   private static Disposable setPlayerInternal(@NonNull SimpleExoPlayer player, PlayerTextureView texture) {
@@ -221,7 +211,24 @@ public class PlayerCardView extends FrameLayout implements Consumer<Item>, Check
   }
 
   /*
-   * */
+  *
+  @Override
+  public void setChecked(boolean checked) {
+    if (checked) setCheckedInternal(true, 200);
+    else setCheckedInternal(false, 0);
+  }
+
+  private void setCheckedInternal(boolean checked, long delay) {
+    removeCallbacks(mPendingCheckedRunnable);
+    postDelayed(
+      mPendingCheckedRunnable = () -> {
+        if (checked == mIsActive) return;
+        System.out.println("setChecked checked = [" + checked + "] " + this.hashCode());
+        mIsActive = checked;
+        invalidateState(false);
+      }, delay);
+  }
+  * */
 
   /** {@inheritDoc} *//*
   @Override

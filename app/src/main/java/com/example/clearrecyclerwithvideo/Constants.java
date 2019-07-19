@@ -1,4 +1,4 @@
-package com.example.clearrecyclerwithvideo.utils;
+package com.example.clearrecyclerwithvideo;
 
 import com.example.clearrecyclerwithvideo.data.DataService;
 
