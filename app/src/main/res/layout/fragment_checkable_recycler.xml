@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout android:layout_width="match_parent"
+<RelativeLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android" >
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#333">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
@@ -12,6 +13,16 @@
         android:id="@+id/indicator"
         android:layout_width="match_parent"
         android:layout_height="5dp"
-        android:background="#333"/>
+        android:background="#fff"/>
 
-</FrameLayout>
+    <CheckBox
+        android:id="@+id/checkbox_elastic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ELASTIC CENTER"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:buttonTint="#fff"
+        android:textColor="#fff"/>
+
+</RelativeLayout>

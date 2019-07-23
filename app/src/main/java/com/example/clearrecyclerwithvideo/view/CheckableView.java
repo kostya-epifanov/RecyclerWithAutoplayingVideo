@@ -3,9 +3,8 @@ package com.example.clearrecyclerwithvideo.view;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.Checkable;
-import android.widget.TextView;
 
-
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
 
 import com.example.clearrecyclerwithvideo.R;
@@ -17,7 +16,7 @@ import java.util.function.Consumer;
  * @author Konstantin Epifanov
  * @since 19.07.2019
  */
-public class CheckableView extends TextView implements Consumer<Integer>, Checkable {
+public class CheckableView extends AppCompatTextView implements Consumer<Integer>, Checkable {
 
   private Integer pos;
   private boolean isChecked;
@@ -32,6 +31,8 @@ public class CheckableView extends TextView implements Consumer<Integer>, Checka
 
   public CheckableView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+
+    setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
   }
 
   @Override

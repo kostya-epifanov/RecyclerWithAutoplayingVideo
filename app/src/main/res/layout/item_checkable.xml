@@ -8,6 +8,7 @@
     android:layout_marginTop="2dp"
     android:layout_marginRight="4dp"
     android:layout_marginBottom="2dp"
+    android:textColor="#fff"
     android:background="@drawable/rect_2"
     android:buttonTint="#000"
     android:gravity="center"

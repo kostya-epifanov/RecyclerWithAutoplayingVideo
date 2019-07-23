@@ -2,6 +2,7 @@ package com.example.clearrecyclerwithvideo.utils;
 
 import android.content.Context;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.Checkable;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,6 +36,7 @@ public class RadioLayoutManager extends LinearLayoutManager {
   };
 
   private View mIndicator;
+  private CheckBox mCbElastic;
 
   private Supplier<Integer> getRecyclerHeight;
   private int mSmartCenterY = 0;
@@ -43,19 +45,18 @@ public class RadioLayoutManager extends LinearLayoutManager {
     super(context);
   }
 
-  public RadioLayoutManager(Context context, View indicator) {
+  public RadioLayoutManager(Context context, View indicator, CheckBox cbElastic) {
     super(context);
     this.mIndicator = indicator;
+    this.mCbElastic = cbElastic;
   }
 
   @Override
   public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
-
     int i = super.scrollVerticallyBy(dy, recycler, state);
-
     if (getRecyclerHeight != null) {
       mSmartCenterY = getSmartCenterY(dy, getRecyclerHeight.get());
-
+      System.out.println("mSmartCenterY: " + mSmartCenterY);
       if (mSmartCenterY == -1) deactivate(mActiveCard.isChecked());
       else onScrolled(mSmartCenterY);
 
@@ -63,9 +64,19 @@ public class RadioLayoutManager extends LinearLayoutManager {
         mIndicator.setTranslationY(mSmartCenterY);
       }
     }
-
     return i;
+  }
 
+  private int getSmartCenterY(int dy, int height) {
+    if (mCbElastic.isChecked()) {
+      int centerY = height / 2;
+      int smartCenter = centerY + dy * 8;
+      if (smartCenter < 0 || smartCenter > height) return -1;
+      return smartCenter;
+
+    } else {
+      return getRecyclerHeight.get() / 2;
+    }
   }
 
   @Override
@@ -91,6 +102,7 @@ public class RadioLayoutManager extends LinearLayoutManager {
   }
 
   private void deactivate(boolean isChecked) {
+    System.out.println("deactivate isChecked = [" + isChecked + "]");
     if (!isChecked) return;
     mActiveCard.setChecked(false);
   }
@@ -109,13 +121,6 @@ public class RadioLayoutManager extends LinearLayoutManager {
       list.add(getChildAt(i));
     }
     return list.stream();
-  }
-
-  private int getSmartCenterY(int dy, int height) {
-    int centerY = height / 2;
-    int smartCenter = centerY + dy * 10;
-    if (smartCenter < 0 || smartCenter > height) return -1;
-    return smartCenter;
   }
 
   @Override

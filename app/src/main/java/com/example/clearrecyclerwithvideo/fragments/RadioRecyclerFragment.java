@@ -41,7 +41,8 @@ public class RadioRecyclerFragment extends Fragment {
 
     mRecycler.setAdapter(Utils.getSimpleAdapter(LayoutInflater.from(getContext()), R.layout.item_checkable));
 
-    mRecycler.setLayoutManager(new RadioLayoutManager(getContext(), root.findViewById(R.id.indicator)));
+    mRecycler.setLayoutManager(new RadioLayoutManager(getContext(),
+      root.findViewById(R.id.indicator), root.findViewById(R.id.checkbox_elastic)));
 
     submitList(getList());
 
