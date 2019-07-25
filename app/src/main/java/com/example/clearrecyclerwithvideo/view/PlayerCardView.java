@@ -14,8 +14,8 @@ import androidx.annotation.NonNull;
 
 import com.example.clearrecyclerwithvideo.R;
 import com.example.clearrecyclerwithvideo.data.Item;
-import com.example.clearrecyclerwithvideo.utils.DrawableTarget;
-import com.example.clearrecyclerwithvideo.utils.ExoHolder;
+import com.example.clearrecyclerwithvideo.utils.android.DrawableTarget;
+import com.example.clearrecyclerwithvideo.utils.player.ExoHolder;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.video.VideoListener;
 

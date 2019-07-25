@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clearrecyclerwithvideo.R;
 import com.example.clearrecyclerwithvideo.utils.Utils;
-import com.example.clearrecyclerwithvideo.utils.RadioLayoutManager;
+import com.example.clearrecyclerwithvideo.utils.android.RadioLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;

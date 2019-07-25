@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.clearrecyclerwithvideo.R;
 import com.example.clearrecyclerwithvideo.data.DataService;
 import com.example.clearrecyclerwithvideo.data.Item;
-import com.example.clearrecyclerwithvideo.utils.ChildViews;
+import com.example.clearrecyclerwithvideo.utils.android.ChildViews;
 import com.example.clearrecyclerwithvideo.Constants;
 import com.example.clearrecyclerwithvideo.utils.Utils;
 

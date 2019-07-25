@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.clearrecyclerwithvideo.fragments.RadioRecyclerFragment;
 import com.example.clearrecyclerwithvideo.fragments.RecyclerFragment;
+import com.example.clearrecyclerwithvideo.fragments.SingleCardFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
     getSupportFragmentManager().beginTransaction()
-      .replace(R.id.fragment_container, RadioRecyclerFragment.newInstance())
+      .replace(R.id.fragment_container, SingleCardFragment.newInstance())
       .addToBackStack(null)
       .commit();
   }

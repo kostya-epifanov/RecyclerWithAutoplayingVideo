@@ -1,5 +1,7 @@
 package com.example.clearrecyclerwithvideo.data;
 
+import androidx.annotation.NonNull;
+
 import com.example.clearrecyclerwithvideo.Constants;
 
 import java.util.ArrayList;
@@ -65,6 +67,14 @@ public class DataService {
     return result;
   }
 
+  private static int counter = 0;
+
+  public static UrlHolder getNextItem(List<UrlHolder> urls) {
+    if (counter == urls.size()) counter = 0;
+    // if (++counter % 5 == 0) return null;
+    return urls.get(counter++);
+  }
+
   /**
    * @author Konstantin Epifanov
    * @since 10.07.2019
@@ -84,6 +94,12 @@ public class DataService {
 
     public String getScreenshotUrl() {
       return screenshotUrl;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+      return "NotNull";
     }
   }
 }

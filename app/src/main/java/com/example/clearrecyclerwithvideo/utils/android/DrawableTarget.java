@@ -17,7 +17,7 @@
  * from Realtime Technologies Limited.
  */
 
-package com.example.clearrecyclerwithvideo.utils;
+package com.example.clearrecyclerwithvideo.utils.android;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -467,7 +467,7 @@ public class DrawableTarget extends Drawable implements Target<Bitmap> {
     private final Bitmap mBitmap;
 
     /**
-     * Call this to create a new shader that will draw with a bitmap.
+     * Call this to createHandlerWrapper a new shader that will draw with a bitmap.
      *
      * @param bitmap The bitmap to use inside the shader
      */

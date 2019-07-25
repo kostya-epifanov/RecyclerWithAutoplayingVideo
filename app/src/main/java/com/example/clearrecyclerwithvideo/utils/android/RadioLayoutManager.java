@@ -1,4 +1,4 @@
-package com.example.clearrecyclerwithvideo.utils;
+package com.example.clearrecyclerwithvideo.utils.android;
 
 import android.content.Context;
 import android.view.View;
