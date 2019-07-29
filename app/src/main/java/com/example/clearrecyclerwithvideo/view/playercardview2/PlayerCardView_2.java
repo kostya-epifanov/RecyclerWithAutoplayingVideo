@@ -165,6 +165,8 @@ public class PlayerCardView_2 extends FrameLayout implements Consumer<DataServic
   private static Disposable setPlayerInternal(@NonNull SimpleExoPlayer player, PlayerTextureView texture) {
     final Disposable.Swap swap = Disposables.swap();
 
+    System.out.println("PlayerCardView_2.setPlayerInternal: " + player.hashCode());
+
     return Disposables.composite(
       getVideoSize(player, point -> texture.initialize(point.x, point.y)),
       //getFirstFrame(player, () -> swap.replace(executeAnimation(alphaTo(texture, true)))),
@@ -209,10 +211,10 @@ public class PlayerCardView_2 extends FrameLayout implements Consumer<DataServic
   }
 
   private static Disposable setupTextureView(SimpleExoPlayer player, PlayerTextureView texture) {
-    player.setVideoTextureView(texture);
+    //player.setVideoTextureView(texture);
     return Disposables.composite((Disposable) () -> {
       System.out.println("PlayerCardView.setupTextureView: dispose");
-      player.setVideoTextureView(null);
+      //player.setVideoTextureView(null);
     });
   }
 

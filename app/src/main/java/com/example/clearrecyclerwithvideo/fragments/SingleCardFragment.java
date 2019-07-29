@@ -81,16 +81,16 @@ public class SingleCardFragment extends Fragment {
 
     ExoHolder.setupCache(getContext());
 
+    /*
     mDisposable =
       ExoHolder.getFromCache(getContext(), Constants.urls.get(0).getVideoUrl())
         .log()
         .subscribe(player -> {
           mPlayer = (SimpleExoPlayer) player;
           mCardView.setPlayer(mPlayer, true);
-        });
+        });*/
 
     /*
-
     mPlayer.addVideoListener(new VideoListener() {
       @Override
       public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
@@ -106,7 +106,6 @@ public class SingleCardFragment extends Fragment {
         mPlayer.setVideoTextureView(mCardView.getTextureView());
       }
     });
-
     */
 
     return root;
@@ -172,8 +171,14 @@ public class SingleCardFragment extends Fragment {
   private void bombAccept() {
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     executor.scheduleAtFixedRate(
-      () -> mCardView.accept(DataService.getNextItem(Constants.urls)),
-      0, 5000, TimeUnit.MILLISECONDS);
+      () -> {
+        //mCardView.accept(DataService.getNextItem(Constants.urls));
+
+        ExoHolder
+          .getFromCache(getContext(), DataService.getNextItem(Constants.urls).getVideoUrl())
+          .subscribe(player -> mCardView.setPlayer((SimpleExoPlayer) player, true));
+
+      }, 0, 5000, TimeUnit.MILLISECONDS);
   }
 
   private void bombCheck() {

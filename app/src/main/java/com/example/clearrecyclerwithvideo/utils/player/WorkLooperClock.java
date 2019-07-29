@@ -15,7 +15,7 @@ import com.google.android.exoplayer2.util.HandlerWrapperUtils;
  * @since 25.07.2019
  * The implementation of {@link Clock} with custom looper.
  */
-final class WorkLooperClock implements Clock {
+public final class WorkLooperClock implements Clock {
 
   @Override
   public long elapsedRealtime() {

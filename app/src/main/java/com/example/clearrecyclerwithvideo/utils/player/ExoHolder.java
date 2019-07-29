@@ -2,7 +2,6 @@ package com.example.clearrecyclerwithvideo.utils.player;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.LruCache;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -134,18 +133,44 @@ public class ExoHolder {
 
     HlsMediaSource.Factory factory = new HlsMediaSource.Factory(factory1);
     return new androidx.collection.LruCache<String, Player>(1) {
+
+      private Player tempPlayer;
+
       @Override
       protected final Player create(@NonNull String key) {
-        final ExoPlayer result = (ExoPlayer) getPlayer(context);
-        result.setPlayWhenReady(true);
+        System.out.println("ExoHolder.create");
+        ExoPlayer result = (ExoPlayer) getTempPlayer();
+
+        if (result == null) {
+          result = (ExoPlayer) ExoHolder.getPlayer(context);
+          result.setPlayWhenReady(true);
+        }
+
         result.prepare(factory.createMediaSource(parse(key)));
+
         return result;
       }
 
       @Override
       protected void entryRemoved(boolean evicted, @NonNull String key, @NonNull Player oldValue, @Nullable Player newValue) {
-        oldValue.release();
+        System.out.println("ExoHolder.entryRemoved");
+        setTempPlayer(oldValue);
         super.entryRemoved(evicted, key, oldValue, newValue);
+      }
+
+      Player getTempPlayer() {
+        System.out.println("ExoHolder.getTempPlayer");
+        try {
+          return tempPlayer;
+        } finally {
+          tempPlayer = null;
+        }
+      }
+
+      void setTempPlayer(Player tempPlayer) {
+        System.out.println("ExoHolder.setTempPlayer");
+        tempPlayer.stop();
+        this.tempPlayer = tempPlayer;
       }
     };
   }

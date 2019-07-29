@@ -4,9 +4,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.clearrecyclerwithvideo.fragments.RadioRecyclerFragment;
-import com.example.clearrecyclerwithvideo.fragments.RecyclerFragment;
-import com.example.clearrecyclerwithvideo.fragments.SingleCardFragment;
+import com.example.clearrecyclerwithvideo.player_controller_playground.MediaFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
     getSupportFragmentManager().beginTransaction()
-      .replace(R.id.fragment_container, SingleCardFragment.newInstance())
+      .replace(R.id.fragment_container, MediaFragment.newInstance())
       .addToBackStack(null)
       .commit();
   }
