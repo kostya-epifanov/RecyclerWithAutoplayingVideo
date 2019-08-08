@@ -47,9 +47,53 @@ public class Constants {
   );
   public static List<DataService.UrlHolder> urls2 = Arrays.asList(
     new DataService.UrlHolder("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8", "https://images.unsplash.com/photo-1446292267125-fecb4ecbf1a5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80"),
-    new DataService.UrlHolder("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8", "https://images.unsplash.com/photo-1535127022272-dbe7ee35cf33?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80"),
-    new DataService.UrlHolder("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8", "https://images.unsplash.com/photo-1507919981044-3b672b208db9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"),
-    new DataService.UrlHolder("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8", "https://images.unsplash.com/photo-1507415329510-9e85a4183e73?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"),
-    new DataService.UrlHolder("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8", "https://images.unsplash.com/photo-1513624954087-ca7109c0f710?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80")
+    new DataService.UrlHolder("https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8", "https://images.unsplash.com/photo-1535127022272-dbe7ee35cf33?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80"),
+    new DataService.UrlHolder("https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8", "https://images.unsplash.com/photo-1507919981044-3b672b208db9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"),
+    new DataService.UrlHolder("https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8", "https://images.unsplash.com/photo-1513624954087-ca7109c0f710?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"),
+    new DataService.UrlHolder("https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8", "https://images.unsplash.com/photo-1513624954087-ca7109c0f710?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"),
+    new DataService.UrlHolder("https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8", "https://images.unsplash.com/photo-1513624954087-ca7109c0f710?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"),
+    new DataService.UrlHolder("https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8", "https://images.unsplash.com/photo-1513624954087-ca7109c0f710?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"),
+    new DataService.UrlHolder("https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/gear1/prog_index.m3u8", "https://images.unsplash.com/photo-1513624954087-ca7109c0f710?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"),
+    new DataService.UrlHolder("https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/gear0/prog_index.m3u8", "https://images.unsplash.com/photo-1513624954087-ca7109c0f710?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80")
   );
+
+  private static int counter = 0;
+  public static DataService.UrlHolder getNextItem(List<DataService.UrlHolder> urls) {
+    if (counter == urls.size()) counter = 0;
+    // if (++counter % 5 == 0) return null;
+    return urls.get(counter++);
+  }
 }
+
+/*\
+
+    "name": "HLS",
+    "samples": [
+      {
+        "name": "Apple 4x3 basic stream",
+        "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8"
+      },
+      {
+        "name": "Apple 16x9 basic stream",
+        "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8"
+      },
+      {
+        "name": "Apple master playlist advanced (TS)",
+        "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8"
+      },
+      {
+        "name": "Apple master playlist advanced (fMP4)",
+        "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8"
+      },
+      {
+        "name": "Apple TS media playlist",
+        "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/gear1/prog_index.m3u8"
+      },
+      {
+        "name": "Apple AAC media playlist",
+        "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/gear0/prog_index.m3u8"
+      }
+    ]
+  }
+
+* */

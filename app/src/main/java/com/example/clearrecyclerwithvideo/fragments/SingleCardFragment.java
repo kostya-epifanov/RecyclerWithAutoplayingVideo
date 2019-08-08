@@ -2,7 +2,6 @@ package com.example.clearrecyclerwithvideo.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.clearrecyclerwithvideo.Constants;
 import com.example.clearrecyclerwithvideo.R;
-import com.example.clearrecyclerwithvideo.data.DataService;
 import com.example.clearrecyclerwithvideo.utils.player.ExoHolder;
-import com.example.clearrecyclerwithvideo.utils.reactor.Schedule;
 import com.example.clearrecyclerwithvideo.view.PlayerTextureView;
 import com.example.clearrecyclerwithvideo.view.playercardview2.PlayerCardView_2;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -175,7 +172,7 @@ public class SingleCardFragment extends Fragment {
         //mCardView.accept(DataService.getNextItem(Constants.urls));
 
         ExoHolder
-          .getFromCache(getContext(), DataService.getNextItem(Constants.urls).getVideoUrl())
+          .getFromCache(getContext(), Constants.getNextItem(Constants.urls).getVideoUrl())
           .subscribe(player -> mCardView.setPlayer((SimpleExoPlayer) player, true));
 
       }, 0, 5000, TimeUnit.MILLISECONDS);

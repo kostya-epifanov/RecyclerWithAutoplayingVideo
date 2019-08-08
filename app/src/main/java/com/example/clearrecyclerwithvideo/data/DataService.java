@@ -67,14 +67,6 @@ public class DataService {
     return result;
   }
 
-  private static int counter = 0;
-
-  public static UrlHolder getNextItem(List<UrlHolder> urls) {
-    if (counter == urls.size()) counter = 0;
-    // if (++counter % 5 == 0) return null;
-    return urls.get(counter++);
-  }
-
   /**
    * @author Konstantin Epifanov
    * @since 10.07.2019

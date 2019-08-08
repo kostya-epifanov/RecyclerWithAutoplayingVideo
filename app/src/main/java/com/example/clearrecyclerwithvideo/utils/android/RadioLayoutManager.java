@@ -56,7 +56,6 @@ public class RadioLayoutManager extends LinearLayoutManager {
     int i = super.scrollVerticallyBy(dy, recycler, state);
     if (getRecyclerHeight != null) {
       mSmartCenterY = getSmartCenterY(dy, getRecyclerHeight.get());
-      System.out.println("mSmartCenterY: " + mSmartCenterY);
       if (mSmartCenterY == -1) deactivate(mActiveCard.isChecked());
       else onScrolled(mSmartCenterY);
 
@@ -68,7 +67,7 @@ public class RadioLayoutManager extends LinearLayoutManager {
   }
 
   private int getSmartCenterY(int dy, int height) {
-    if (mCbElastic.isChecked()) {
+    if (mCbElastic == null || mCbElastic.isChecked()) {
       int centerY = height / 2;
       int smartCenter = centerY + dy * 8;
       if (smartCenter < 0 || smartCenter > height) return -1;
@@ -102,7 +101,6 @@ public class RadioLayoutManager extends LinearLayoutManager {
   }
 
   private void deactivate(boolean isChecked) {
-    System.out.println("deactivate isChecked = [" + isChecked + "]");
     if (!isChecked) return;
     mActiveCard.setChecked(false);
   }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.example.clearrecyclerwithvideo.player_controller_playground.ItemView3
+    android:id="@+id/container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="780dp"
+    android:background="@drawable/rect_2"
+    android:padding="20dp">
+
+    <com.example.clearrecyclerwithvideo.view.PlayerTextureView
+        android:id="@+id/texture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</com.example.clearrecyclerwithvideo.player_controller_playground.ItemView3>

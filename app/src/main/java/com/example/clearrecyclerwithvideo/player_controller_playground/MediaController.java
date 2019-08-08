@@ -1,6 +1,7 @@
 package com.example.clearrecyclerwithvideo.player_controller_playground;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.view.TextureView;
 
@@ -14,8 +15,12 @@ import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.analytics.AnalyticsCollector;
+import com.google.android.exoplayer2.drm.DrmSessionManager;
+import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
+import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.source.hls.DefaultHlsDataSourceFactory;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -25,7 +30,10 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 import reactor.core.publisher.Mono;
@@ -45,29 +53,14 @@ public class MediaController {
     long time = System.currentTimeMillis();
 
     System.out.println("MediaController.getFromCache " + url);
+
     if (sCache == null) {
       sCache = createPlayersCache(context);
     }
-    Mono<Player> mono = Mono.create((Consumer<MonoSink<Player>>) monoSink -> monoSink.success(sCache.get(url)))
-      .transform(Schedule::work_main)
-      /*.map(p -> {
-        System.out.println("MediaController.getFromCache map 1" + p.hashCode());
-        ExtendedExoPlayer player = (ExtendedExoPlayer) p;
 
-        player.setVideoTextureView(texture);
-
-        player.addVideoListener(new VideoListener() {
-          @Override
-          public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-            ((PlayerTextureView) texture).initialize(width, height);
-          }
-        });
-
-        System.out.println("MediaController.getFromCache map 2" + p.hashCode());
-
-        return p;
-      })*/
-      .log();
+    Mono<Player> mono =
+      Mono.create((Consumer<MonoSink<Player>>) monoSink -> monoSink.success(sCache.get(url)))
+        .transform(Schedule::work_main);
 
     try {
       return mono;
@@ -83,7 +76,7 @@ public class MediaController {
       new DefaultHttpDataSourceFactory(Util.getUserAgent(context, "Webka"), listener));
     DefaultHlsDataSourceFactory hlsDataSourceFactory = new DefaultHlsDataSourceFactory(dataSourceFactory);
     HlsMediaSource.Factory factory = new HlsMediaSource.Factory(hlsDataSourceFactory);
-    return new androidx.collection.LruCache<String, Player>(1) {
+    return new androidx.collection.LruCache<String, Player>(2) {
       private Player tempPlayer;
 
       @Override
@@ -98,11 +91,11 @@ public class MediaController {
 
         result.prepare(factory.createMediaSource(parse(key)));
 
-        try {
-          Thread.sleep(1000);
+        /*try {
+          Thread.sleep(200);
         } catch (InterruptedException e) {
           e.printStackTrace();
-        }
+        }*/
 
         return result;
       }
@@ -125,12 +118,19 @@ public class MediaController {
 
       void setTempPlayer(Player tempPlayer) {
         System.out.println("ExoHolder.setTempPlayer");
-        tempPlayer.stop();
+
         try {
+          tempPlayer.stop();
+        } catch (Exception e) {
+          //
+        }
+
+        /*try {
           Thread.sleep(1000);
         } catch (InterruptedException e) {
           e.printStackTrace();
-        }
+        }*/
+
         this.tempPlayer = tempPlayer;
       }
     };
@@ -144,9 +144,68 @@ public class MediaController {
     SimpleExoPlayer result =
       new ExtendedExoPlayer(
         context,
-        new DefaultRenderersFactory(context),
+        new DefaultRenderersFactory(context) {
+
+          @Override
+          protected void buildVideoRenderers(Context context, @Nullable DrmSessionManager<FrameworkMediaCrypto> drmSessionManager, long allowedVideoJoiningTimeMs, Handler eventHandler, VideoRendererEventListener eventListener, int extensionRendererMode, ArrayList<Renderer> out) {
+            out.add(
+              new ExtendedExoPlayer.CustomVideoRenderer(
+                context,
+                MediaCodecSelector.DEFAULT,
+                allowedVideoJoiningTimeMs,
+                drmSessionManager,
+                /* playClearSamplesWithoutKeys= */ false,
+                eventHandler,
+                eventListener,
+                MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY));
+
+            if (extensionRendererMode == EXTENSION_RENDERER_MODE_OFF) {
+              return;
+            }
+            int extensionRendererIndex = out.size();
+            if (extensionRendererMode == EXTENSION_RENDERER_MODE_PREFER) {
+              extensionRendererIndex--;
+            }
+
+            try {
+              // Full class names used for constructor args so the LINT rule triggers if any of them move.
+              // LINT.IfChange
+              Class<?> clazz = Class.forName("com.google.android.exoplayer2.ext.vp9.LibvpxVideoRenderer");
+              Constructor<?> constructor =
+                clazz.getConstructor(
+                  boolean.class,
+                  long.class,
+                  android.os.Handler.class,
+                  com.google.android.exoplayer2.video.VideoRendererEventListener.class,
+                  int.class);
+              // LINT.ThenChange(../../../../../../../proguard-rules.txt)
+              Renderer renderer =
+                (Renderer)
+                  constructor.newInstance(
+                    true,
+                    allowedVideoJoiningTimeMs,
+                    eventHandler,
+                    eventListener,
+                    MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY);
+              out.add(extensionRendererIndex++, renderer);
+              com.google.android.exoplayer2.util.Log.i("TAG", "Loaded LibvpxVideoRenderer.");
+            } catch (ClassNotFoundException e) {
+              // Expected if the app was built without the extension.
+            } catch (Exception e) {
+              // The extension is present, but instantiation failed.
+              throw new RuntimeException("Error instantiating VP9 extension", e);
+            }
+          }
+        },
+
         new DefaultTrackSelector(),
-        new DefaultLoadControl(),
+        new DefaultLoadControl() {
+          @Override
+          public void onPrepared() {
+            super.onPrepared();
+            System.out.println("ON PREPAREED");
+          }
+        }, //TODO loadControl.onPrepared(); - реальный препэйр медиа соурса
         null,
         new DefaultBandwidthMeter.Builder().build(),
         new AnalyticsCollector.Factory(),

@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.clearrecyclerwithvideo.player_controller_playground.MediaFragment;
+import com.example.clearrecyclerwithvideo.player_controller_playground.MediaFragment3;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
     getSupportFragmentManager().beginTransaction()
-      .replace(R.id.fragment_container, MediaFragment.newInstance())
+      .replace(R.id.fragment_container, MediaFragment3.newInstance())
       .addToBackStack(null)
       .commit();
   }

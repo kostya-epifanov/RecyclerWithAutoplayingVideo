@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.clearrecyclerwithvideo.Constants;
 import com.example.clearrecyclerwithvideo.R;
-import com.example.clearrecyclerwithvideo.data.DataService;
 import com.example.clearrecyclerwithvideo.utils.reactor.Schedule;
 import com.example.clearrecyclerwithvideo.view.PlayerTextureView;
 
@@ -80,16 +79,17 @@ public class MediaFragment extends Fragment {
   }
 
   private void test() {
-    String videoUrl = DataService.getNextItem(Constants.urls).getVideoUrl();
+    String videoUrl = Constants.getNextItem(Constants.urls).getVideoUrl();
     Schedule.WORK_EXECUTOR.execute(() ->
       MediaController
         .getFromCache(getContext(), mTexture1, videoUrl)
         .subscribe(p -> {
           ExtendedExoPlayer player = (ExtendedExoPlayer) p;
-
-          mTexture1.initialize(1080, 720);
           System.out.println("MediaFragment.test 1 " + System.currentTimeMillis());
-          player.accept(new Surface(mTexture1.getSurfaceTexture())); //нужен релиз
+
+          player.accept(new Surface(mTexture1.getSurfaceTexture()),
+            point -> mTexture1.initialize(point.x, point.y)); //нужен релиз
+
           System.out.println("MediaFragment.test 2 " + System.currentTimeMillis());
 
           System.out.println("MediaFragment.test player: ПОЛУЧЕН " + hashCode());
